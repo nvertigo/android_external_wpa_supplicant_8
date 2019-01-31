@@ -910,18 +910,25 @@ enum hostapd_chan_status acs_init(struct hostapd_iface *iface)
 
 	if (iface->drv_flags & WPA_DRIVER_FLAGS_ACS_OFFLOAD) {
 		wpa_printf(MSG_INFO, "ACS: Offloading to driver");
-		if (hostapd_drv_do_acs(iface->bss[0]))
+		if (hostapd_drv_do_acs(iface->bss[0])) {
+                        wpa_printf(MSG_INFO, "ACS: nvertigo: hostapd_drv_do_acs failed.");
 			return HOSTAPD_CHAN_INVALID;
+                }
+                wpa_printf(MSG_INFO, "ACS: nvertigo: hostapd_drv_do_acs succeeded.");
 		return HOSTAPD_CHAN_ACS;
 	}
 
-	if (!iface->current_mode)
+	if (!iface->current_mode) {
+                wpa_printf(MSG_INFO, "ACS: nvertigo: current_mode invalid");
 		return HOSTAPD_CHAN_INVALID;
+        }
 
 	acs_cleanup(iface);
 
-	if (acs_request_scan(iface) < 0)
+	if (acs_request_scan(iface) < 0) {
+                wpa_printf(MSG_INFO, "ACS: nvertigo: acs_request_scan failed");
 		return HOSTAPD_CHAN_INVALID;
+        }
 
 	hostapd_set_state(iface, HAPD_IFACE_ACS);
 	wpa_msg(iface->bss[0]->msg_ctx, MSG_INFO, ACS_EVENT_STARTED);
